@@ -10,7 +10,7 @@ const SearchFeed = () => {
   const { searchTerm } = useParams();
 
   useEffect(() => {
-    fetchFromAPI(`search?part=snippet&q=${searchTerm}`)
+  fetchFromAPI(`search?part=snippet&q=${encodeURIComponent(searchTerm)}&maxResults=50&type=video`)
       .then((data) => setVideos(data.items))
   }, [searchTerm]);
 

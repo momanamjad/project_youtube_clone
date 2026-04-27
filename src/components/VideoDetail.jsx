@@ -12,12 +12,18 @@ const VideoDetail = () => {
   const [videos, setVideos] = useState(null);
   const { id } = useParams();
 
-  useEffect(() => {
+useEffect(() => {
     fetchFromAPI(`videos?part=snippet,statistics&id=${id}`)
-      .then((data) => setVideoDetail(data.items[0]))
-
-    fetchFromAPI(`search?part=snippet&relatedToVideoId=${id}&type=video`)
-      .then((data) => setVideos(data.items))
+      .then((data) => {
+        const video = data.items[0];
+        if (!video) return;
+        setVideoDetail(video);
+        const channelId = video.snippet.channelId;
+        fetchFromAPI(`search?part=snippet&channelId=${channelId}&type=video&maxResults=50`)
+          .then((data) => setVideos(data.items))
+          .catch((err) => console.error(err));
+      })
+      .catch((err) => console.error(err));
   }, [id]);
 
   if(!videoDetail?.snippet) return <Loader />;
