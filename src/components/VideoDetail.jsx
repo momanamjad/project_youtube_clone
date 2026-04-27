@@ -15,13 +15,15 @@ const VideoDetail = () => {
 useEffect(() => {
     fetchFromAPI(`videos?part=snippet,statistics&id=${id}`)
       .then((data) => {
-        setVideoDetail(data.items[0]);
-        // Use channel title for related videos
-        // relatedToVideoId was deprecated by YouTube in 2023
-        const channelTitle = data.items[0]?.snippet?.channelTitle;
-        fetchFromAPI(`search?part=snippet&q=${channelTitle}&type=video&maxResults=50`)
-          .then((data) => setVideos(data.items));
-      });
+        const video = data.items[0];
+        if (!video) return;
+        setVideoDetail(video);
+        const channelId = video.snippet.channelId;
+        fetchFromAPI(`search?part=snippet&channelId=${channelId}&type=video&maxResults=50`)
+          .then((data) => setVideos(data.items))
+          .catch((err) => console.error(err));
+      })
+      .catch((err) => console.error(err));
   }, [id]);
 
   if(!videoDetail?.snippet) return <Loader />;
